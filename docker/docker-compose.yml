@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  app:
+    build:
+        context: ..
+        dockerfile: docker/app/Dockerfile
+    tty: true
+    ports:
+      - 2020:2020
+    volumes:
+      - ../src:/go/src/app
+    working_dir: /go/src/app
+    depends_on:
+      - db
+    environment:
+        GOPATH: /go
+        GOBIN: /go/bin
+    entrypoint: >
+        /bin/sh -c "
+        go get;
+        go run cmd/main.go;"
+
+  db:
+    image: mysql:5.7
+    environment:
+        MYSQL_ROOT_PASSWORD: password
+    ports:
+      - 3306:3306
+    volumes:
+      - ./db/data:/var/lib/mysql:cached
